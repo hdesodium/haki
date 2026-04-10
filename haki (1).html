@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>haki</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Playfair+Display:ital,wght@0,400;0,500;1,400;1,500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#0d0b14;
+  --glass:rgba(255,255,255,0.06);
+  --glass2:rgba(255,255,255,0.10);
+  --border:rgba(255,255,255,0.12);
+  --border2:rgba(255,255,255,0.22);
+  --text:#f4f2ff;
+  --muted:rgba(244,242,255,0.55);
+  --muted2:rgba(244,242,255,0.28);
+  --r:22px;
+  --r2:14px;
+  --font-d:'Playfair Display',serif;
+  --font-s:'Nunito',sans-serif;
+  --acc:#d4b8ff;
+  --acc2:#a78bfa;
+  --acc-dim:rgba(212,184,255,0.10);
+  --acc-glow:rgba(167,139,250,0.30);
+  --pip-acc:#d4b8ff;
+  --pip-glow:rgba(212,184,255,0.25);
+  --pip-dim:rgba(212,184,255,0.09);
+  --pip-border:rgba(212,184,255,0.30);
+}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font-s);overflow:hidden;-webkit-font-smoothing:antialiased;}
+
+/* ── SCREENS ── */
+.screen{position:fixed;inset:0;display:none;flex-direction:column;overflow:hidden;}
+.screen.active{display:flex;animation:fadeIn 0.28s ease;}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+
+/* ── BG SYSTEM ── */
+.bg-img{
+  position:absolute;inset:0;z-index:0;
+  background-size:cover;background-position:center;
+  transition:opacity 0.5s ease;
+}
+.bg-vignette{
+  position:absolute;inset:0;z-index:1;
+  background:linear-gradient(180deg,
+    rgba(13,11,20,0.35) 0%,
+    rgba(13,11,20,0.50) 40%,
+    rgba(13,11,20,0.88) 72%,
+    rgba(13,11,20,0.97) 100%);
+}
+.content{position:relative;z-index:2;display:flex;flex-direction:column;height:100%;overflow:hidden;}
+
+/* ── SAFE AREA ── */
+.safe-top{height:env(safe-area-inset-top,44px);flex-shrink:0;}
+
+/* ── STATUS ROW ── */
+.status-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:8px 22px 0;flex-shrink:0;
+}
+.sync-pill{
+  display:flex;align-items:center;gap:5px;
+  padding:4px 10px;border-radius:9999px;
+  background:var(--glass);border:1px solid var(--border);
+  font-size:0.58rem;letter-spacing:0.08em;color:var(--muted);
+  font-family:var(--font-s);
+}
+.sdot{width:5px;height:5px;border-radius:50%;background:var(--muted2);transition:background 0.3s;}
+.sdot.ok{background:#6ee7a0;}
+.sdot.err{background:#f87171;}
+.sdot.syncing{background:var(--acc);animation:blink 1s infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0.3;}}
+
+/* ── HOME ── */
+#home{}
+.home-topbar{
+  padding:16px 22px 0;display:flex;align-items:flex-start;justify-content:space-between;flex-shrink:0;
+}
+.home-greeting{
+  font-family:var(--font-s);font-size:0.68rem;
+  letter-spacing:0.16em;text-transform:uppercase;color:var(--muted);margin-bottom:3px;
+}
+.home-title{
+  font-family:var(--font-d);font-size:2.6rem;font-weight:400;font-style:italic;
+  color:var(--text);letter-spacing:-0.01em;line-height:1;
+}
+.home-title span{color:var(--pip-acc);}
+.home-settings-btn{
+  width:38px;height:38px;border-radius:12px;
+  background:var(--glass);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1rem;cursor:pointer;color:var(--muted);flex-shrink:0;
+  transition:all 0.15s;margin-top:4px;
+}
+.home-settings-btn:active{transform:scale(0.92);}
+
+.home-date{
+  font-size:0.65rem;color:var(--muted);
+  padding:6px 22px 14px;font-family:var(--font-s);
+}
+
+/* pipeline cards */
+.pip-scroll{flex:1;overflow-y:auto;padding:0 16px;display:flex;flex-direction:column;gap:14px;padding-bottom:20px;}
+.pip-scroll::-webkit-scrollbar{display:none;}
+
+.pip-card{
+  border-radius:var(--r);overflow:hidden;cursor:pointer;
+  position:relative;height:148px;flex-shrink:0;
+  border:1px solid var(--border);
+  transition:transform 0.2s,box-shadow 0.2s;
+}
+.pip-card:active{transform:scale(0.975);}
+.pip-card-bg{
+  position:absolute;inset:0;background-size:cover;background-position:center;
+  transition:transform 0.4s ease;filter:brightness(0.75) saturate(1.1);
+}
+.pip-card:hover .pip-card-bg{transform:scale(1.04);}
+.pip-card-grad{
+  position:absolute;inset:0;
+  background:linear-gradient(110deg,rgba(13,11,20,0.90) 0%,rgba(13,11,20,0.60) 55%,rgba(13,11,20,0.15) 100%);
+}
+.pip-card-body{
+  position:relative;z-index:2;height:100%;
+  padding:16px 18px;display:flex;flex-direction:column;justify-content:space-between;
+}
+.pip-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;}
+.pip-card-label{
+  font-family:var(--font-d);font-size:1.55rem;font-weight:400;font-style:italic;
+  line-height:1.1;color:var(--text);
+}
+.pip-card-sub{font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-top:3px;}
+
+.pip-icon-wrap{
+  width:58px;height:58px;border-radius:14px;flex-shrink:0;
+  overflow:hidden;border:1.5px solid var(--border2);
+  background:rgba(13,11,20,0.55);
+  box-shadow:0 4px 20px var(--pip-glow);
+  position:relative;
+}
+.pip-icon-wrap img{width:100%;height:100%;object-fit:cover;image-rendering:pixelated;}
+.icon-swap-btn{
+  position:absolute;bottom:3px;right:3px;width:17px;height:17px;
+  border-radius:5px;background:rgba(0,0,0,0.72);border:1px solid rgba(255,255,255,0.18);
+  display:flex;align-items:center;justify-content:center;font-size:8px;cursor:pointer;color:#fff;
+}
+
+.pip-card-bottom{display:flex;align-items:center;gap:10px;}
+.pip-prog-track{flex:1;height:2px;background:rgba(255,255,255,0.12);border-radius:1px;}
+.pip-prog-fill{height:2px;border-radius:1px;transition:width 0.4s;}
+.pip-prog-label{font-size:0.6rem;color:var(--muted);white-space:nowrap;font-family:var(--font-s);}
+.pip-tag{
+  padding:3px 9px;border-radius:9999px;font-size:0.58rem;
+  letter-spacing:0.1em;text-transform:uppercase;
+  background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);color:var(--muted);
+  font-family:var(--font-s);
+}
+
+/* recent sessions */
+.home-section{padding:0 22px;flex-shrink:0;}
+.section-ttl{font-size:0.58rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted2);margin-bottom:8px;font-family:var(--font-s);}
+.chips-row{display:flex;gap:7px;overflow-x:auto;padding-bottom:4px;}
+.chips-row::-webkit-scrollbar{display:none;}
+.chip{
+  flex-shrink:0;padding:7px 14px;border-radius:9999px;
+  background:var(--glass);border:1px solid var(--border);
+  color:var(--muted);font-size:0.68rem;cursor:pointer;white-space:nowrap;
+  transition:all 0.15s;font-family:var(--font-s);
+}
+.chip.active{border-color:var(--pip-acc);color:var(--pip-acc);background:var(--pip-dim);}
+.chip:active{transform:scale(0.95);}
+
+.home-footer{padding:12px 16px 28px;flex-shrink:0;}
+.new-btn{
+  width:100%;padding:14px;border-radius:var(--r2);
+  background:var(--glass2);border:1px solid var(--border2);
+  color:var(--text);font-family:var(--font-s);font-size:0.82rem;font-weight:600;
+  cursor:pointer;letter-spacing:0.06em;transition:all 0.15s;
+  backdrop-filter:blur(8px);
+}
+.new-btn:active{transform:scale(0.98);}
+
+/* ── SETTINGS PANEL ── */
+#settings-panel{
+  position:fixed;inset:0;z-index:150;display:none;align-items:flex-end;
+  background:rgba(13,11,20,0.7);backdrop-filter:blur(12px);
+}
+#settings-panel.open{display:flex;animation:slideUp 0.3s ease;}
+@keyframes slideUp{from{opacity:0;transform:translateY(30px);}to{opacity:1;transform:translateY(0);}}
+.settings-box{
+  width:100%;background:#1a1726;border-radius:28px 28px 0 0;
+  border-top:1px solid var(--border2);padding:20px 20px 36px;
+  max-height:80vh;overflow-y:auto;
+}
+.settings-box::-webkit-scrollbar{display:none;}
+.settings-ttl{font-family:var(--font-d);font-size:1.3rem;font-weight:400;font-style:italic;color:var(--text);margin-bottom:4px;}
+.settings-sub{font-size:0.65rem;color:var(--muted);margin-bottom:18px;}
+.settings-section-ttl{font-size:0.58rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--muted2);margin-bottom:10px;margin-top:16px;font-family:var(--font-s);}
+.bg-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.bg-opt{
+  aspect-ratio:9/16;border-radius:10px;overflow:hidden;cursor:pointer;
+  border:2px solid transparent;transition:all 0.15s;position:relative;
+}
+.bg-opt img{width:100%;height:100%;object-fit:cover;}
+.bg-opt.sel{border-color:var(--pip-acc);box-shadow:0 0 14px var(--pip-glow);}
+.bg-opt:active{transform:scale(0.94);}
+.bg-opt-check{
+  position:absolute;bottom:4px;right:4px;width:18px;height:18px;
+  border-radius:50%;background:var(--pip-acc);display:none;
+  align-items:center;justify-content:center;font-size:9px;color:#000;font-weight:700;
+}
+.bg-opt.sel .bg-opt-check{display:flex;}
+.settings-close{
+  width:100%;margin-top:18px;padding:12px;border-radius:14px;
+  background:var(--glass);border:1px solid var(--border);
+  color:var(--muted);font-family:var(--font-s);font-size:0.8rem;cursor:pointer;
+}
+
+/* ── SESSION SCREEN ── */
+#session{}
+.session-topbar{
+  display:flex;align-items:center;gap:12px;
+  padding:10px 18px 8px;flex-shrink:0;
+}
+.back-btn{
+  width:36px;height:36px;border-radius:10px;
+  background:var(--glass);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1rem;cursor:pointer;color:var(--muted);flex-shrink:0;
+  backdrop-filter:blur(6px);transition:all 0.15s;
+}
+.back-btn:active{transform:scale(0.9);}
+.session-pip-label{
+  font-family:var(--font-d);font-size:1rem;font-weight:400;font-style:italic;
+  flex:1;color:var(--pip-acc);
+}
+.step-pill{
+  padding:4px 11px;border-radius:9999px;
+  background:var(--pip-dim);border:1px solid var(--pip-border);
+  font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;
+  color:var(--pip-acc);font-family:var(--font-s);flex-shrink:0;
+}
+
+/* dots */
+.dots-wrap{padding:0 18px 12px;flex-shrink:0;}
+.dots{display:flex;gap:4px;}
+.dot{height:3px;flex:1;border-radius:2px;background:rgba(255,255,255,0.10);transition:all 0.32s;}
+.dot.done{background:var(--pip-acc);opacity:0.45;}
+.dot.cur{background:var(--pip-acc);box-shadow:0 0 7px var(--pip-glow);}
+
+/* hero card */
+.hero-card{
+  margin:0 18px;border-radius:var(--r);overflow:hidden;
+  height:170px;flex-shrink:0;position:relative;
+  border:1px solid var(--border2);
+}
+.hero-card-bg{
+  position:absolute;inset:0;background-size:cover;background-position:center 30%;
+  filter:brightness(0.7) saturate(1.1);
+}
+.hero-card-grad{
+  position:absolute;inset:0;
+  background:linear-gradient(180deg,transparent 25%,rgba(13,11,20,0.75) 100%);
+}
+.hero-card-content{
+  position:relative;z-index:2;height:100%;
+  display:flex;align-items:flex-end;padding:14px 16px;gap:12px;
+}
+.hero-icon{
+  width:52px;height:52px;border-radius:12px;overflow:hidden;
+  border:1.5px solid var(--border2);flex-shrink:0;
+  box-shadow:0 4px 16px var(--pip-glow);
+}
+.hero-icon img{width:100%;height:100%;object-fit:cover;image-rendering:pixelated;}
+.hero-text{}
+.hero-step-num{font-size:0.58rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--pip-acc);opacity:0.8;margin-bottom:2px;}
+.hero-step-name{font-family:var(--font-d);font-size:1.1rem;font-style:italic;color:var(--text);line-height:1.2;}
+
+/* prompt */
+.prompt-scroll{flex:1;overflow-y:auto;padding:14px 18px 0;}
+.prompt-scroll::-webkit-scrollbar{width:2px;}
+.prompt-scroll::-webkit-scrollbar-thumb{background:var(--border);}
+.prompt-text{
+  font-size:0.9rem;line-height:1.9;color:rgba(244,242,255,0.84);
+  white-space:pre-wrap;font-family:var(--font-s);font-weight:300;
+}
+
+/* notes section */
+.notes-wrap{padding:10px 18px;flex-shrink:0;}
+.notes-hdr{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:7px 0;cursor:pointer;
+}
+.notes-lbl{
+  font-size:0.62rem;letter-spacing:0.14em;text-transform:uppercase;
+  color:var(--muted);display:flex;align-items:center;gap:6px;font-family:var(--font-s);
+}
+.note-dot{width:5px;height:5px;border-radius:50%;background:var(--pip-acc);display:none;}
+.notes-chev{font-size:0.52rem;color:var(--muted2);transition:transform 0.2s;}
+.notes-chev.open{transform:rotate(180deg);}
+.notes-body{display:none;padding-top:8px;}
+.notes-body.open{display:block;}
+.note-ta{
+  width:100%;min-height:78px;background:var(--glass);border:1px solid var(--border);
+  border-radius:12px;padding:11px 13px;color:var(--text);
+  font-family:var(--font-s);font-size:0.85rem;font-weight:300;line-height:1.65;
+  resize:none;outline:none;transition:border-color 0.15s;
+  backdrop-filter:blur(4px);
+}
+.note-ta:focus{border-color:var(--pip-border);}
+.note-ta::placeholder{color:var(--muted2);}
+.note-actions{display:flex;gap:8px;margin-top:8px;}
+.note-mic-btn{
+  width:34px;height:34px;border-radius:9px;background:var(--glass);
+  border:1px solid var(--border);display:flex;align-items:center;justify-content:center;
+  color:var(--muted);font-size:0.85rem;cursor:pointer;flex-shrink:0;transition:all 0.15s;
+}
+.note-mic-btn.rec{border-color:var(--pip-acc);color:var(--pip-acc);background:var(--pip-dim);}
+.note-save-btn{
+  flex:1;padding:8px;border-radius:9px;
+  background:var(--pip-dim);border:1px solid var(--pip-border);
+  color:var(--pip-acc);font-family:var(--font-s);font-size:0.72rem;font-weight:600;
+  cursor:pointer;transition:all 0.15s;
+}
+.note-save-btn:active{transform:scale(0.97);}
+.voice-hint{font-size:0.62rem;color:var(--muted);text-align:center;padding:4px 0;display:none;}
+.saved-note-preview{
+  font-size:0.78rem;color:var(--muted);font-weight:300;padding:8px 12px;margin-top:6px;
+  background:var(--glass);border-radius:10px;border-left:2px solid var(--pip-acc);
+  white-space:pre-wrap;word-break:break-word;display:none;
+}
+
+/* footer */
+.session-footer{display:flex;gap:10px;padding:8px 18px 30px;flex-shrink:0;}
+.foot-btn{
+  flex:1;padding:14px;border-radius:var(--r2);
+  font-family:var(--font-s);font-size:0.82rem;font-weight:600;
+  cursor:pointer;transition:all 0.18s;
+  background:var(--glass);border:1px solid var(--border);color:var(--muted);
+  backdrop-filter:blur(6px);
+}
+.foot-btn.primary{background:var(--pip-dim);border-color:var(--pip-border);color:var(--pip-acc);}
+.foot-btn:disabled{opacity:0.28;pointer-events:none;}
+.foot-btn:active{transform:scale(0.97);}
+
+/* ── ICON PICKER ── */
+#icon-picker{
+  position:fixed;inset:0;z-index:200;
+  background:rgba(13,11,20,0.78);backdrop-filter:blur(14px);
+  display:none;align-items:flex-end;
+}
+#icon-picker.open{display:flex;animation:slideUp 0.28s ease;}
+.picker-box{
+  width:100%;background:#1c1828;border-radius:28px 28px 0 0;
+  border-top:1px solid var(--border2);padding:20px 20px 36px;
+}
+.picker-ttl{font-family:var(--font-d);font-size:1.15rem;font-style:italic;color:var(--text);margin-bottom:16px;}
+.picker-grid{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
+.picker-opt{
+  width:76px;height:76px;border-radius:16px;overflow:hidden;
+  border:2px solid var(--border);background:var(--glass2);
+  cursor:pointer;transition:all 0.15s;
+}
+.picker-opt img{width:100%;height:100%;object-fit:cover;image-rendering:pixelated;}
+.picker-opt.sel{border-color:var(--pip-acc);box-shadow:0 0 14px var(--pip-glow);}
+.picker-opt:active{transform:scale(0.93);}
+.picker-cancel{
+  width:100%;margin-top:14px;padding:12px;border-radius:12px;
+  background:var(--glass);border:1px solid var(--border);
+  color:var(--muted);font-family:var(--font-s);font-size:0.8rem;cursor:pointer;
+}
+</style>
+</head>
+<body>
+
+<!-- HOME -->
+<div id="home" class="screen active">
+  <div class="bg-img" id="home-bg"></div>
+  <div class="bg-vignette"></div>
+  <div class="content">
+    <div class="safe-top"></div>
+    <div class="status-row">
+      <div class="home-date" style="padding:0;" id="date-lbl"></div>
+      <div class="sync-pill"><div class="sdot" id="sdot"></div><span id="slbl">—</span></div>
+    </div>
+    <div class="home-topbar">
+      <div>
+        <div class="home-greeting">Bienvenue</div>
+        <div class="home-title">🍈<span>haki</span></div>
+      </div>
+      <button class="home-settings-btn" onclick="openSettings()">⚙</button>
+    </div>
+    <div style="height:16px;flex-shrink:0;"></div>
+    <div class="pip-scroll" id="pip-list"></div>
+    <div class="home-section" style="margin-top:10px;margin-bottom:8px;">
+      <div class="section-ttl">Sessions récentes</div>
+      <div class="chips-row" id="conv-chips"></div>
+    </div>
+    <div class="home-footer">
+      <button class="new-btn" onclick="newSession()">+ Nouvelle session</button>
+    </div>
+  </div>
+</div>
+
+<!-- SESSION -->
+<div id="session" class="screen">
+  <div class="bg-img" id="session-bg"></div>
+  <div class="bg-vignette"></div>
+  <div class="content">
+    <div class="safe-top"></div>
+    <div class="session-topbar">
+      <button class="back-btn" onclick="goHome()">←</button>
+      <div class="session-pip-label" id="s-pip-lbl"></div>
+      <div class="step-pill" id="s-step-pill"></div>
+    </div>
+    <div class="dots-wrap"><div class="dots" id="dots"></div></div>
+    <div class="hero-card" id="hero-card">
+      <div class="hero-card-bg" id="hero-card-bg"></div>
+      <div class="hero-card-grad"></div>
+      <div class="hero-card-content">
+        <div class="hero-icon"><img id="hero-icon-img" src="" alt=""></div>
+        <div class="hero-text">
+          <div class="hero-step-num" id="hero-step-num"></div>
+          <div class="hero-step-name" id="hero-step-name"></div>
+        </div>
+      </div>
+    </div>
+    <div class="prompt-scroll">
+      <div class="prompt-text" id="prompt-text"></div>
+    </div>
+    <div class="notes-wrap">
+      <div class="notes-hdr" onclick="toggleNotes()">
+        <div class="notes-lbl"><span>Notes</span><div class="note-dot" id="note-dot"></div></div>
+        <div class="notes-chev" id="notes-chev">▼</div>
+      </div>
+      <div class="notes-body" id="notes-body">
+        <textarea class="note-ta" id="note-ta" placeholder="Tes réflexions sur cette étape…"></textarea>
+        <div class="note-actions">
+          <button class="note-mic-btn" id="note-mic" onclick="toggleVoice()">🎙</button>
+          <button class="note-save-btn" onclick="saveNote()">Sauvegarder</button>
+        </div>
+        <div class="voice-hint" id="voice-hint"></div>
+        <div class="saved-note-preview" id="saved-note-preview"></div>
+      </div>
+    </div>
+    <div class="session-footer">
+      <button class="foot-btn" id="prev-btn" onclick="prevStep()">← Précédent</button>
+      <button class="foot-btn primary" id="next-btn" onclick="nextStep()">Suivant →</button>
+    </div>
+  </div>
+</div>
+
+<!-- SETTINGS PANEL -->
+<div id="settings-panel" onclick="maybeCloseSettings(event)">
+  <div class="settings-box">
+    <div class="settings-ttl">Paramètres</div>
+    <div class="settings-sub">Personnalise l'apparence de haki</div>
+    <div class="settings-section-ttl">Fond de l'accueil</div>
+    <div class="bg-grid" id="home-bg-grid"></div>
+    <button class="settings-close" onclick="closeSettings()">Fermer</button>
+  </div>
+</div>
+
+<!-- ICON PICKER -->
+<div id="icon-picker" onclick="maybeCloseIconPicker(event)">
+  <div class="picker-box">
+    <div class="picker-ttl">Choisir une icône</div>
+    <div class="picker-grid" id="picker-grid"></div>
+    <button class="picker-cancel" onclick="closeIconPicker()">Annuler</button>
+  </div>
+</div>
+
+<script>
+// ── RAW BASE ──
+const RAW = n => `https://raw.githubusercontent.com/hdesodium/haki/fonds/${n}`;
+const ICON = n => `https://raw.githubusercontent.com/hdesodium/haki/icones/${encodeURIComponent(n)}`;
+
+// ── ALL BACKGROUNDS ──
+const ALL_FONDS = [
+  '11f105bd12788fd5a72febe7585fecab.jpg',
+  'be6cbf612b172a13bc4bbf06fdb3faae.jpg',
+  '72fc0f8dee693991ca32884b0e3630b4.jpg',
+  '3832e51ec3224308c618e9993df8481b.jpg',
+  '77374bea898309cd082b0f08ed8e9de3.jpg',
+  '6816943c785fa9d4456a872f25223aa4.jpg',
+  '430e07e0fb7bddfea81f784566bbf5a6.jpg',
+  '5443e29eff44bbe56dc6699997ff1df2.jpg',
+  '7f361ca0dcf34fec5cea24b747d62924.jpg',
+  '24fe508337f6b7cbb3a2f3adab630dea.jpg',
+  '1117ed42a09da3fe186a256df5fd542f.jpg',
+  'dc7ccc4cbbecad7d040922d8b309dacb.jpg',
+  '7c6e738aecb103008cde67e438cfeca0.jpg',
+];
+
+// ── PIPELINES ──
+const PIPELINES = {
+  ultra_instinct: {
+    label:'Ultra Instinct',
+    acc:'#c4b5fd', glow:'rgba(196,181,253,0.25)', dim:'rgba(196,181,253,0.09)', border:'rgba(196,181,253,0.32)',
+    bg:'be6cbf612b172a13bc4bbf06fdb3faae.jpg',
+    icons:{ default:'ultra instinct1.png', alts:['ultra instinct1.png','ultra instinct2.png','super saiyan1.png','supersaiyan 2.png'] },
+    steps:[
+      {name:"Parlons peu, parlons bien",prompt:"Prends un moment pour te centrer.\n\nRacontes-toi librement ta situation. Qu'est-ce qui se passe en ce moment dans ta vie ? Qu'est-ce qui t'a amenée ici aujourd'hui ?\n\nSois honnête avec toi-même. Partage une confidence — quelque chose que tu n'oses pas toujours te dire."},
+      {name:"Observation",prompt:"Observe ce que tu ressens.\n\nQuelles émotions sont présentes en ce moment ? Nomme-les avec précision : est-ce de la tristesse, de la colère, de la honte, de la peur, de la frustration ?\n\nQuel est ton besoin primaire ?\n— Autonomie : liberté, contrôle de ta vie, indépendance.\n— Compétence : te sentir capable, efficace, à la hauteur.\n— Connexion : appartenir, être comprise, être aimée.\n\nQuel besoin secondaire, plus personnel, découle de ce besoin primaire ?"},
+      {name:"Analyse",prompt:"Analyse en profondeur.\n\nQu'est-ce qui a déclenché cette situation ? Distingue ce que tu as ressenti intérieurement (pensées, sensations physiques, émotions) de ce que tu as fait ou dit extérieurement.\n\nY a-t-il un schéma qui se répète dans ta vie ? As-tu déjà vécu quelque chose de similaire ?\n\nQuelle croyance sur toi-même ou sur les autres est à l'œuvre ici ? Nomme-la clairement."},
+      {name:"Adaptation",prompt:"Reformule et adapte.\n\nComment pourrais-tu reformuler ta croyance limitante en quelque chose de plus aidant, sans te mentir ?\n\nDans cette situation, quelle est ta responsabilité réelle ? Qu'est-ce qui n'est pas de ton ressort ?\n\nQu'est-ce que tu peux concrètement ajuster dans ton comportement, tes mots ou tes attentes ?"},
+      {name:"Self-respect",prompt:"Qu'est-ce que cette situation t'apprend sur ton self-respect ?\n\nAs-tu respecté tes propres limites ? As-tu dit oui quand tu voulais dire non ? As-tu tu quelque chose d'important ?\n\nComment aurais-tu pu te respecter davantage ? Comment le feras-tu à l'avenir ?"},
+      {name:"Self-worth",prompt:"Ta valeur propre.\n\nCette situation a-t-elle ébranlé ta perception de ta valeur ? Si oui, sur quoi était-elle basée — sur l'approbation des autres, sur ta performance, sur les résultats ?\n\nTa valeur est intrinsèque. Elle ne dépend pas de ce qui s'est passé. Qu'est-ce que tu sais de toi-même, de façon certaine, indépendamment de cette situation ?"},
+      {name:"Apprentissage : SIIU",prompt:"Intègre.\n\nComment peux-tu t'adapter en restant dans le respect de toi-même et de l'autre ?\n\nQu'est-ce que tu crées comme valeur pour toi à travers cette expérience ?\n\nMaturité émotionnelle = conscience de tes états internes + capacité d'ajustement pour ton bien-être + conscience des états des autres + ajustement pour le bien-être collectif.\n\nOù en es-tu sur cette équation aujourd'hui ?"},
+    ]
+  },
+  circuit_social: {
+    label:'Social',
+    acc:'#fda4af', glow:'rgba(253,164,175,0.25)', dim:'rgba(253,164,175,0.09)', border:'rgba(253,164,175,0.32)',
+    bg:'24fe508337f6b7cbb3a2f3adab630dea.jpg',
+    icons:{ default:'kaioken1.png', alts:['kaioken1.png','kaioken2.png','goku1.png','goku2.png'] },
+    steps:[
+      {name:"Situation relationnelle",prompt:"Pose le contexte.\n\nDécris la situation relationnelle ou sociale que tu veux observer. Qui est impliqué ? Quel est le contexte ? Que s'est-il passé exactement ?\n\nReste factuelle et descriptive, sans jugement pour l'instant."},
+      {name:"Dynamiques en jeu",prompt:"Observe les mécanismes.\n\nQuelles dynamiques sont à l'œuvre dans cette relation ou ce groupe ?\n\nY a-t-il des rôles implicites — qui sauve, qui attaque, qui subit ? Y a-t-il une hiérarchie, une compétition, une dépendance ? Comment les échanges fonctionnent-ils — réciprocité, équité, dette ?\n\nNomme ce que tu observes, sans te positionner moralement."},
+      {name:"Patterns comportementaux",prompt:"Tes schémas dans cette dynamique.\n\nComment te comportes-tu habituellement dans ce type de relation ou de situation ?\n\nQuels comportements de ta part se répètent ? Que fais-tu instinctivement — tu te fermes, tu t'effaces, tu sur-expliques, tu compenses ?\n\nQuel est l'impact de ces comportements sur toi et sur les autres ?"},
+      {name:"Frontières et besoins",prompt:"Tes frontières.\n\nDans cette dynamique, où sont tes frontières ? Sont-elles poreuses — tu te laisses envahir. Rigides — tu te coupes des autres. Flexibles — tu t'adaptes tout en te respectant.\n\nQuel besoin est frustré ici — autonomie, compétence ou connexion ? Qu'est-ce que tu cherches vraiment dans cette relation ?"},
+      {name:"Ajustements concrets",prompt:"Ce que tu peux faire différemment.\n\nQu'est-ce qui changerait si tu posais une frontière claire ? Si tu exprimais ton besoin directement plutôt qu'indirectement ?\n\nQu'est-ce que tu peux ajuster dans ton prochain comportement dans cette dynamique ?"},
+      {name:"Leçon sociale",prompt:"La compétence sociale.\n\nQu'est-ce que cette situation t'apprend sur ta façon d'interagir avec les autres ?\n\nQuelle compétence sociale peux-tu développer à travers cette expérience — écoute, assertivité, lecture des dynamiques, gestion des conflits ?\n\nComment maintenir une connexion saine tout en te respectant ?"},
+      {name:"Équation sociale",prompt:"Intègre.\n\nMaturité sociale = (maturité émotionnelle × réflexivité) + exposition + compréhension d'autrui.\n\nOù en es-tu sur chacune de ces dimensions aujourd'hui ?\n\nQu'est-ce que cette expérience sociale t'a appris que tu peux emporter avec toi ?"},
+    ]
+  },
+  salle_du_temps: {
+    label:'Salle du temps',
+    acc:'#6ee7b7', glow:'rgba(110,231,183,0.25)', dim:'rgba(110,231,183,0.09)', border:'rgba(110,231,183,0.32)',
+    bg:'5443e29eff44bbe56dc6699997ff1df2.jpg',
+    icons:{ default:'salle du temps 1.png', alts:['salle du temps 1.png','salle du temps 2.png'] },
+    steps:[
+      {name:"Bienvenue",prompt:"Bienvenue dans la Salle du temps.\n\nIci, le temps s'arrête. Tu es seule avec toi-même.\n\nRacontes-toi ta situation librement. Qu'est-ce qui t'a amenée ici ? Qu'est-ce que tu portes en ce moment ?\n\nPartage une confidence — quelque chose d'honnête que tu te dis rarement à toi-même."},
+      {name:"Confidences",prompt:"Un gage d'honnêteté.\n\nQuelle est la chose que tu n'oses pas tout à fait te dire sur cette situation ? Pas ce que tu dirais à quelqu'un d'autre — ce que tu sais, au fond, et que tu évites de regarder en face.\n\nÉcris-la. Sans filtre."},
+      {name:"Liste des émotions",prompt:"Nomme ce que tu ressens.\n\nPrends le temps de lister toutes les émotions présentes. Pas juste les grandes — les petites aussi, celles qui se cachent derrière les autres.\n\nPeur. Honte. Tristesse. Colère. Déception. Soulagement. Ambivalence. Culpabilité. Solitude. Fierté malgré tout.\n\nLaquelle est la plus forte ? Laquelle est la plus difficile à admettre ?"},
+      {name:"Besoin primaire",prompt:"Le besoin derrière l'émotion.\n\nTon besoin primaire dans cette situation est-il :\n— Autonomie : liberté, contrôle de ta vie, indépendance.\n— Compétence : te sentir capable, efficace, à la hauteur.\n— Connexion : appartenir, être comprise, être aimée.\n\nLequel résonne le plus profondément ?"},
+      {name:"Besoin secondaire",prompt:"Plus précisément.\n\nAu-delà du besoin primaire, quel est le besoin plus spécifique, plus personnel ?\n\nPar exemple : si ton besoin primaire est la connexion, ton besoin secondaire pourrait être d'être choisie, d'être écoutée sans être jugée, d'appartenir à quelque chose de vrai.\n\nNomme ce besoin le plus précisément possible. Il t'appartient."},
+      {name:"Déclencheurs",prompt:"Ce qui a tout mis en mouvement.\n\nQu'est-ce qui a déclenché cette situation ou cette émotion ?\n\nDans ton monde intérieur — qu'as-tu pensé ? Qu'as-tu ressenti physiquement ? Quelle interprétation as-tu faite ?\n\nDans ton comportement extérieur — qu'as-tu dit ou fait ? Qu'as-tu évité ?\n\nObserve sans te juger."},
+      {name:"Schémas répétitifs",prompt:"Le motif qui revient.\n\nEst-ce que tu reconnais quelque chose de familier dans cette situation ?\n\nEst-ce une dynamique que tu as déjà vécue — avec d'autres personnes, dans d'autres contextes, à d'autres moments de ta vie ?\n\nQuel est le schéma ? Comment se manifeste-t-il habituellement ? Quel rôle joues-tu dedans ?"},
+      {name:"Croyances limitantes",prompt:"Ce qui te retient.\n\nDerrière ce schéma, il y a une croyance — quelque chose que tu as intégré sur toi, sur les autres ou sur le monde.\n\n« Je dois mériter l'amour. » « Si je demande, on va me rejeter. » « Je ne suis jamais assez. » « Les autres ne restent pas. »\n\nQuelle est ta croyance ? Dis-la clairement, sans l'habiller."},
+      {name:"Reformulation",prompt:"Transformer sans se mentir.\n\nTa croyance a une histoire — elle t'a probablement protégée à un moment. Mais est-elle encore vraie aujourd'hui ?\n\nComment pourrais-tu la reformuler d'une façon qui soit à la fois plus aidante et honnête ?\n\nPas une affirmation positive forcée — une vérité plus nuancée, plus complète, plus juste."},
+      {name:"Responsabilités",prompt:"Ce qui t'appartient.\n\nDans cette situation, qu'est-ce qui est réellement de ta responsabilité ?\n\nEt qu'est-ce qui ne l'est pas — qu'est-ce que tu portes qui appartient à quelqu'un d'autre ?\n\nDéposer ce qui n'est pas le tien n'est pas fuir. C'est de la clarté."},
+      {name:"Adaptation",prompt:"Ce que tu peux faire.\n\nMaintenant que tu as vu la situation plus clairement, qu'est-ce que tu peux concrètement ajuster ?\n\nPas de grands changements radicaux — des petits ajustements réels, ancrés dans ce que tu viens de comprendre.\n\nQu'est-ce que tu vas faire différemment demain ?"},
+      {name:"Self-respect",prompt:"Le respect de toi-même.\n\nComment cette expérience t'a-t-elle appris quelque chose sur le self-respect ?\n\nAs-tu posé tes limites ? As-tu agi en accord avec tes valeurs ? As-tu dit ce qui était vrai pour toi ?\n\nComment vas-tu te respecter davantage à l'avenir, concrètement ?"},
+      {name:"Self-worth",prompt:"Ta valeur propre.\n\nTa valeur ne se prouve pas et ne se perd pas. Elle est.\n\nQu'est-ce que cette situation t'a appris sur la façon dont tu perçois ta propre valeur ?\n\nSur quoi as-tu tendance à baser ta valeur — le regard des autres, tes performances, tes relations ?\n\nQu'est-ce que tu sais de toi-même qui reste vrai, quoi qu'il arrive ?"},
+      {name:"Apprentissage : SIIU",prompt:"La synthèse.\n\nComment peux-tu t'adapter tout en restant dans le respect de toi-même et de l'autre ?\n\nQu'est-ce que tu te crées comme valeur à travers cette expérience ?\n\nMaturité émotionnelle = conscience de tes états internes + capacité d'ajustement pour ton bien-être + conscience des états des autres + ajustement pour le bien-être collectif.\n\nLà où tu en es aujourd'hui sur cette équation — qu'est-ce que tu vois ?"},
+    ]
+  },
+};
+
+// ── STATE ──
+const S = {
+  pipeline:'ultra_instinct', step:0,
+  convName:null, allConvs:[],
+  notes:{}, iconChoice:{},
+  homeBg:'430e07e0fb7bddfea81f784566bbf5a6.jpg',
+  editingPip:null,
+};
+
+function pip(){ return PIPELINES[S.pipeline]; }
+function iconFor(p){ return S.iconChoice[p] || PIPELINES[p].icons.default; }
+function iconSrc(p){ return ICON(iconFor(p)); }
+function bgSrc(f){ return RAW(f); }
+
+function applyTheme(p){
+  const cfg = PIPELINES[p];
+  const r = document.documentElement;
+  r.style.setProperty('--pip-acc', cfg.acc);
+  r.style.setProperty('--pip-glow', cfg.glow);
+  r.style.setProperty('--pip-dim', cfg.dim);
+  r.style.setProperty('--pip-border', cfg.border);
+}
+
+function ts(){
+  const d=new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}_${String(d.getHours()).padStart(2,'0')}-${String(d.getMinutes()).padStart(2,'0')}-${String(d.getSeconds()).padStart(2,'0')}`;
+}
+
+function setDate(){
+  const j=['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+  const m=['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+  const n=new Date();
+  document.getElementById('date-lbl').textContent=`${j[n.getDay()]} ${n.getDate()} ${m[n.getMonth()]}`;
+}
+
+// ── SYNC UI ──
+function syncUI(cls,txt){
+  document.getElementById('sdot').className='sdot '+cls;
+  document.getElementById('slbl').textContent=txt;
+}
+
+// ── FIREBASE ──
+let db=null;
+async function initFB(){
+  try{
+    const {initializeApp}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
+    const {getFirestore,collection,doc,getDocs,setDoc}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    const app=initializeApp({apiKey:'AIzaSyA9M8K9VGejqHCq8S22y2iPzd5rHF3bsBM',authDomain:'haki-2a75b.firebaseapp.com',projectId:'haki-2a75b',storageBucket:'haki-2a75b.firebasestorage.app',messagingSenderId:'1096421970989',appId:'1:1096421970989:web:451f594188d541f5b554a4'});
+    db=getFirestore(app);
+    window._fs={collection,doc,getDocs,setDoc};
+    syncUI('ok','sync');
+    await loadConvs();
+  }catch(e){syncUI('err','hors ligne');}
+  renderHome();
+}
+
+async function save(){
+  if(!db||!S.convName)return;
+  syncUI('syncing','…');
+  try{
+    await window._fs.setDoc(window._fs.doc(db,'haki_sessions',S.convName),{
+      pipeline:S.pipeline,step:S.step,notes:S.notes,
+      iconChoice:S.iconChoice,homeBg:S.homeBg,
+      updatedAt:new Date().toISOString()
+    });
+    syncUI('ok','sync');
+  }catch(e){syncUI('err','erreur');}
+}
+
+async function loadConvs(){
+  if(!db)return;
+  try{
+    const snap=await window._fs.getDocs(window._fs.collection(db,'haki_sessions'));
+    S.allConvs=[];
+    snap.forEach(d=>S.allConvs.push({id:d.id,...d.data()}));
+    S.allConvs.sort((a,b)=>(b.updatedAt||'').localeCompare(a.updatedAt||''));
+    if(S.allConvs.length>0){
+      const last=S.allConvs[0];
+      S.convName=last.id;S.pipeline=last.pipeline||'ultra_instinct';
+      S.step=last.step||0;S.notes=last.notes||{};
+      S.iconChoice=last.iconChoice||{};S.homeBg=last.homeBg||S.homeBg;
+    }
+  }catch(e){}
+}
+
+async function loadConv(id){
+  if(!db)return;
+  try{
+    const snap=await window._fs.getDocs(window._fs.collection(db,'haki_sessions'));
+    snap.forEach(d=>{
+      if(d.id===id){
+        const dt=d.data();
+        S.pipeline=dt.pipeline||'ultra_instinct';S.step=dt.step||0;
+        S.notes=dt.notes||{};S.iconChoice=dt.iconChoice||{};S.homeBg=dt.homeBg||S.homeBg;
+      }
+    });
+  }catch(e){}
+}
+
+// ── HOME ──
+function renderHome(){
+  setDate();
+  // bg
+  document.getElementById('home-bg').style.backgroundImage=`url('${bgSrc(S.homeBg)}')`;
+
+  // pipeline cards
+  const list=document.getElementById('pip-list');
+  list.innerHTML='';
+  Object.entries(PIPELINES).forEach(([key,cfg])=>{
+    const steps=cfg.steps;
+    const progress=S.pipeline===key?((S.step+1)/steps.length*100):0;
+    const stepLbl=S.pipeline===key?`Étape ${S.step+1} / ${steps.length}`:`${steps.length} étapes`;
+    const card=document.createElement('div');
+    card.className='pip-card';
+    card.innerHTML=`
+      <div class="pip-card-bg" style="background-image:url('${bgSrc(cfg.bg)}');"></div>
+      <div class="pip-card-grad"></div>
+      <div class="pip-card-body">
+        <div class="pip-card-top">
+          <div>
+            <div class="pip-card-label" style="color:${cfg.acc};">${cfg.label}</div>
+            <div class="pip-card-sub">${steps.length} étapes · introspection guidée</div>
+          </div>
+          <div class="pip-icon-wrap" style="border-color:rgba(255,255,255,0.22);box-shadow:0 4px 20px ${cfg.glow};">
+            <img src="${iconSrc(key)}" alt="">
+            ${cfg.icons.alts.length>1?`<div class="icon-swap-btn" onclick="openIconPicker(event,'${key}')">⇄</div>`:''}
+          </div>
+        </div>
+        <div class="pip-card-bottom">
+          <div class="pip-prog-track"><div class="pip-prog-fill" style="width:${progress}%;background:${cfg.acc};"></div></div>
+          <div class="pip-prog-label" style="color:${cfg.acc};">${stepLbl}</div>
+        </div>
+      </div>
+    `;
+    card.onclick=e=>{if(e.target.classList.contains('icon-swap-btn'))return;startSession(key);};
+    list.appendChild(card);
+  });
+
+  // recent chips
+  const chips=document.getElementById('conv-chips');
+  chips.innerHTML='';
+  if(!S.allConvs.length){chips.innerHTML='<div style="font-size:0.7rem;color:var(--muted2);padding:6px 0;">Aucune session</div>';return;}
+  S.allConvs.slice(0,10).forEach(c=>{
+    const ch=document.createElement('div');
+    ch.className='chip'+(c.id===S.convName?' active':'');
+    ch.textContent=c.id.replace('haki_','').replace(/_/g,' ');
+    ch.onclick=async()=>{S.convName=c.id;await loadConv(c.id);renderHome();};
+    chips.appendChild(ch);
+  });
+}
+
+// ── SESSION ──
+function startSession(pipKey){
+  S.pipeline=pipKey;
+  applyTheme(pipKey);
+  renderSession();
+  showScreen('session');
+}
+
+function renderSession(){
+  const cfg=pip();
+  const step=cfg.steps[S.step];
+
+  document.getElementById('s-pip-lbl').textContent=cfg.label;
+  document.getElementById('s-pip-lbl').style.color=cfg.acc;
+  document.getElementById('s-step-pill').textContent=`${S.step+1} / ${cfg.steps.length}`;
+
+  // bg = pipeline bg
+  document.getElementById('session-bg').style.backgroundImage=`url('${bgSrc(cfg.bg)}')`;
+
+  // hero card bg = same
+  document.getElementById('hero-card-bg').style.backgroundImage=`url('${bgSrc(cfg.bg)}')`;
+  document.getElementById('hero-icon-img').src=iconSrc(S.pipeline);
+  document.getElementById('hero-step-num').textContent=`Étape ${S.step+1} / ${cfg.steps.length}`;
+  document.getElementById('hero-step-name').textContent=step.name;
+
+  // dots
+  document.getElementById('dots').innerHTML=cfg.steps.map((_,i)=>
+    `<div class="dot ${i<S.step?'done':i===S.step?'cur':''}"></div>`).join('');
+
+  // prompt
+  document.getElementById('prompt-text').textContent=step.prompt;
+  document.querySelector('.prompt-scroll').scrollTop=0;
+
+  // nav
+  const nb=document.getElementById('next-btn');
+  document.getElementById('prev-btn').disabled=S.step===0;
+  if(S.step===cfg.steps.length-1){nb.textContent='✓ Terminer';nb.onclick=()=>{save();goHome();};}
+  else{nb.textContent='Suivant →';nb.onclick=nextStep;}
+
+  // notes
+  const key=`${S.pipeline}_${S.step}`;
+  const existing=S.notes[key]||'';
+  document.getElementById('note-ta').value=existing;
+  const prev=document.getElementById('saved-note-preview');
+  const dot=document.getElementById('note-dot');
+  if(existing){prev.textContent=existing;prev.style.display='block';dot.style.display='block';}
+  else{prev.style.display='none';dot.style.display='none';}
+  document.getElementById('notes-body').classList.remove('open');
+  document.getElementById('notes-chev').classList.remove('open');
+}
+
+window.nextStep=function(){const cfg=pip();if(S.step<cfg.steps.length-1){S.step++;renderSession();save();}};
+window.prevStep=function(){if(S.step>0){S.step--;renderSession();}};
+window.goHome=function(){applyTheme('ultra_instinct');renderHome();showScreen('home');};
+window.newSession=async function(){
+  S.convName=`haki_${ts()}`;S.step=0;S.notes={};S.pipeline='ultra_instinct';
+  await save();await loadConvs();renderHome();
+};
+
+// ── NOTES ──
+window.toggleNotes=function(){
+  const b=document.getElementById('notes-body');
+  const c=document.getElementById('notes-chev');
+  const open=b.classList.toggle('open');
+  c.classList.toggle('open',open);
+};
+window.saveNote=function(){
+  const key=`${S.pipeline}_${S.step}`;
+  const txt=document.getElementById('note-ta').value.trim();
+  S.notes[key]=txt;
+  const prev=document.getElementById('saved-note-preview');
+  const dot=document.getElementById('note-dot');
+  if(txt){prev.textContent=txt;prev.style.display='block';dot.style.display='block';}
+  else{prev.style.display='none';dot.style.display='none';}
+  save();
+};
+
+// ── VOICE ──
+let recog=null,listening=false;
+window.toggleVoice=function(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){alert('Non supporté sur ce navigateur.');return;}
+  if(listening){recog.stop();return;}
+  recog=new SR();recog.lang='fr-FR';recog.continuous=true;recog.interimResults=true;
+  const mic=document.getElementById('note-mic');
+  const hint=document.getElementById('voice-hint');
+  hint.style.display='block';hint.textContent='Parlez…';
+  mic.classList.add('rec');listening=true;
+  recog.onresult=e=>{
+    let final='',interim='';
+    for(let i=e.resultIndex;i<e.results.length;i++){
+      if(e.results[i].isFinal)final+=e.results[i][0].transcript;
+      else interim+=e.results[i][0].transcript;
+    }
+    if(final){const ta=document.getElementById('note-ta');ta.value=(ta.value?ta.value+' ':'')+final;}
+    hint.textContent=interim||'…';
+  };
+  recog.onerror=()=>{mic.classList.remove('rec');hint.style.display='none';listening=false;};
+  recog.onend=()=>{mic.classList.remove('rec');hint.style.display='none';listening=false;};
+  recog.start();
+};
+
+// ── SETTINGS ──
+window.openSettings=function(){
+  const grid=document.getElementById('home-bg-grid');
+  grid.innerHTML='';
+  ALL_FONDS.forEach(f=>{
+    const div=document.createElement('div');
+    div.className='bg-opt'+(S.homeBg===f?' sel':'');
+    div.innerHTML=`<img src="${bgSrc(f)}" loading="lazy"><div class="bg-opt-check">✓</div>`;
+    div.onclick=()=>{
+      S.homeBg=f;
+      document.getElementById('home-bg').style.backgroundImage=`url('${bgSrc(f)}')`;
+      document.querySelectorAll('.bg-opt').forEach(o=>o.classList.remove('sel'));
+      div.classList.add('sel');
+      save();
+    };
+    grid.appendChild(div);
+  });
+  document.getElementById('settings-panel').classList.add('open');
+};
+window.closeSettings=function(){document.getElementById('settings-panel').classList.remove('open');};
+window.maybeCloseSettings=function(e){if(e.target===document.getElementById('settings-panel'))closeSettings();};
+
+// ── ICON PICKER ──
+window.openIconPicker=function(e,pipKey){
+  e.stopPropagation();
+  S.editingPip=pipKey;
+  applyTheme(pipKey);
+  const grid=document.getElementById('picker-grid');
+  grid.innerHTML='';
+  PIPELINES[pipKey].icons.alts.forEach(name=>{
+    const div=document.createElement('div');
+    div.className='picker-opt'+(iconFor(pipKey)===name?' sel':'');
+    div.innerHTML=`<img src="${ICON(name)}" alt="">`;
+    div.onclick=()=>{S.iconChoice[pipKey]=name;closeIconPicker();renderHome();save();};
+    grid.appendChild(div);
+  });
+  document.getElementById('icon-picker').classList.add('open');
+};
+window.closeIconPicker=function(){document.getElementById('icon-picker').classList.remove('open');};
+window.maybeCloseIconPicker=function(e){if(e.target===document.getElementById('icon-picker'))closeIconPicker();};
+
+// ── SCREEN ──
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// ── INIT ──
+initFB();
+</script>
+</body>
+</html>
