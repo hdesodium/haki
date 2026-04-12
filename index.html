@@ -411,54 +411,6 @@ const PIPELINES = {
   },
 };
 
-const SYSTEM_EMOTIONAL = `Tu es un miroir psychologique neutre. Tu n'es pas une thérapeute, une amie, ni une coach. Tu es un outil de réflexion clinique, sobre, précis, et critique avec bienveillance. Tutoies l'utilisatrice.
-
-TON RÔLE :
-— Refléter ce que l'utilisatrice exprime, sans interpréter au-delà de ce qu'elle dit.
-— Nommer les émotions et patterns avec précision, sans les amplifier ni les minimiser.
-— Poser des questions qui ouvrent, jamais des questions qui orientent.
-— Être critique et honnête.
-
-CE QUE TU NE FAIS PAS :
-— Tu ne rassures pas artificiellement.
-— Tu ne valides pas automatiquement les perceptions de l'utilisatrice.
-— Tu ne donnes pas de conseils non sollicités.
-— Tu ne poses pas plusieurs questions à la fois.
-
-FORMAT : Sobre, précis, concis. Langue : français.`;
-
-const SYSTEM_SOCIAL = `Tu es une IA experte en dynamiques sociales. Tu décris des mécanismes, pas des jugements. Tu n'es pas normative. Tutoies l'utilisatrice.
-
-TON RÔLE :
-— Analyser les dynamiques relationnelles avec objectivité.
-— Identifier les mécanismes comportementaux et sociaux sous-jacents.
-— Proposer des ajustements comportementaux concrets, ancrés dans la recherche.
-— Nommer les patterns sans jugement moral.
-
-CE QUE TU NE FAIS PAS :
-— Tu ne moralises pas.
-— Tu ne valides pas les biais cognitifs de l'utilisatrice.
-— Tu ne donnes pas d'opinions sur les tiers mentionnés.
-— Tu ne poses pas plusieurs questions à la fois.
-
-FORMAT : Direct, factuel. Maximum 5-6 phrases. Langue : français.`;
-
-const GROQ_KEY   = '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';
-const GROQ_MODEL = 'deepseek-r1-distill-llama-70b';
-
-const S = {
-  pipeline:'ultra_instinct', step:0,
-  convName:null, allConvs:[], notes:{},
-  iconChoice:{}, pipBgChoice:{},
-  homeBg:'430e07e0fb7bddfea81f784566bbf5a6.jpg',
-  editingPip:null,
-};
-const pip    = () => PIPELINES[S.pipeline];
-const iconFor= p  => S.iconChoice[p]  || PIPELINES[p].icons.default;
-const bgFor  = p  => S.pipBgChoice[p] || PIPELINES[p].bg;
-const iconSrc= p  => ICON(iconFor(p));
-const bgSrc  = f  => RAW(f);
-
 const SYSTEM_EMOTIONAL = `Tu es un miroir psychologique lucide et exigeant. Tu n'es pas là pour rassurer ni pour être agréable, mais pour aider l'utilisatrice à voir clair.
 
 TON RÔLE :
@@ -545,7 +497,6 @@ async function initFB(){
   try{
     const {initializeApp}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
     const {getFirestore,collection,doc,getDocs,getDoc,setDoc}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-    const app=initializeApp({apiKey:'AIzaSyA9M8K9VGejqHCq8S22y2iPzd5rHF3bsBM',authDomain:'haki-2a75b.firebaseapp.com',projectId:'haki-2a75b',storageBucket:'haki-2a75b.firebasestorage.app',messagingSenderId:'1096421970989',appId:'1:1096421970989:web:451f594188d541f5b554a4'});
     const app=initializeApp({apiKey:'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',authDomain:'haki-2a75b.firebaseapp.com',projectId:'haki-2a75b',storageBucket:'haki-2a75b.firebasestorage.app',messagingSenderId:'1096421970989',appId:'1:1096421970989:web:451f594188d541f5b554a4'});
     db=getFirestore(app);
     window._fs={collection,doc,getDocs,getDoc,setDoc};
@@ -747,92 +698,6 @@ function buildSystemPrompt(){
   const now=new Date();
   const j=['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'];
   const m=['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
-  return `${base}\n\n---\nDate : ${j[now.getDay()]} ${now.getDate()} ${m[now.getMonth()]} ${now.getFullYear()}\nPipeline : ${pip().label}\nÉtape en cours : ${step.name}\nContexte de l'étape : ${step.prompt.split('\n')[0]}`;
-}
-
-window.openChat=function(){
-  const step=pip().steps[S.step];
-  document.getElementById('chat-pip-name').textContent=pip().label;
-  document.getElementById('chat-pip-name').style.color=pip().acc;
-  document.getElementById('chat-step-name-lbl').textContent=step.name;
-  applyTheme(S.pipeline);
-  if(chatHistory.length===0){
-    const intro={role:'assistant',content:`Je suis là pour cette étape.\n\nPar où veux-tu commencer ?`};
-    chatHistory.push(intro);
-    renderChatMsgs();
-  }
-  document.getElementById('chat-panel').classList.add('open');
-  setTimeout(()=>document.getElementById('chat-input').focus(),150);
-};
-window.closeChat=function(){document.getElementById('chat-panel').classList.remove('open');};
-window.clearChat=function(){chatHistory=[];document.getElementById('chat-messages').innerHTML='';};
-
-function renderChatMsgs(){
-  const el=document.getElementById('chat-messages');
-  el.innerHTML='';
-  chatHistory.forEach(m=>appendBubble(m,false));
-  el.scrollTop=el.scrollHeight;
-}
-
-function appendBubble(msg,scroll=true){
-  const el=document.getElementById('chat-messages');
-  const wrap=document.createElement('div');
-  wrap.className=`msg-wrap ${msg.role}`;
-  const bubble=document.createElement('div');
-  bubble.className='msg-bubble';
-  bubble.textContent=msg.content;
-  wrap.appendChild(bubble);
-  el.appendChild(wrap);
-  if(scroll)el.scrollTop=el.scrollHeight;
-  return bubble;
-}
-
-window.sendChat=async function(){
-  if(chatStreaming)return;
-  const inp=document.getElementById('chat-input');
-  const text=inp.value.trim();if(!text)return;
-  inp.value='';inp.style.height='auto';
-  const userMsg={role:'user',content:text};
-  chatHistory.push(userMsg);
-  appendBubble(userMsg);
-  chatStreaming=true;
-  document.getElementById('chat-send-btn').disabled=true;
-  const assistantMsg={role:'assistant',content:''};
-  chatHistory.push(assistantMsg);
-  const bubble=appendBubble(assistantMsg);
-  bubble.textContent='…';
-  try{
-    const messages=[
-      {role:'system',content:buildSystemPrompt()},
-      ...chatHistory.slice(0,-1)
-    ];
-    const resp=await fetch('https://api.groq.com/openai/v1/chat/completions',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':`Bearer ${GROQ_KEY}`},
-      body:JSON.stringify({model:GROQ_MODEL,messages,stream:true,max_tokens:800,temperature:0.72})
-    });
-    if(!resp.ok){const err=await resp.text();throw new Error(err);}
-    const reader=resp.body.getReader();
-    const dec=new TextDecoder();
-    let buf='';
-    bubble.textContent='';
-    while(true){
-      const{done,value}=await reader.read();if(done)break;
-      buf+=dec.decode(value,{stream:true});
-      const lines=buf.split('\n');buf=lines.pop();
-      for(const line of lines){
-        if(!line.startsWith('data: '))continue;
-        const data=line.slice(6).trim();if(data==='[DONE]')break;
-        try{const j=JSON.parse(data);const delta=j.choices?.[0]?.delta?.content||'';if(delta){assistantMsg.content+=delta;bubble.textContent=assistantMsg.content;document.getElementById('chat-messages').scrollTop=document.getElementById('chat-messages').scrollHeight;}}catch(e){}
-      }
-    }
-  }catch(e){
-    assistantMsg.content='❌ '+e.message;bubble.textContent=assistantMsg.content;
-  }
-  chatStreaming=false;
-  document.getElementById('chat-send-btn').disabled=false;
-};
-
 
   return `${base}
 
