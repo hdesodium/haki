@@ -46,14 +46,14 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 .pip-card-sub{font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-top:2px;}
 .pip-icon-wrap{width:52px;height:52px;border-radius:12px;flex-shrink:0;overflow:hidden;border:1.5px solid var(--border2);background:rgba(13,11,20,0.55);box-shadow:0 3px 14px var(--pip-glow);position:relative;}
 .pip-icon-wrap img{width:100%;height:100%;object-fit:cover;image-rendering:pixelated;}
-.icon-swap-btn{display:none;}
-.pip-swap-row{display:flex;justify-content:flex-end;padding-top:6px;border-top:1px solid rgba(255,255,255,0.07);margin-top:2px;}
-.pip-swap-btn{padding:4px 10px;border-radius:9999px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.14);color:rgba(244,242,255,0.45);font-size:0.6rem;letter-spacing:0.1em;cursor:pointer;transition:all 0.15s;}
-.pip-swap-btn:active{transform:scale(0.95);color:var(--text);}
 .pip-card-bottom{display:flex;align-items:center;gap:10px;}
 .pip-prog-track{flex:1;height:2px;background:rgba(255,255,255,0.10);border-radius:1px;}
 .pip-prog-fill{height:2px;border-radius:1px;transition:width 0.4s;}
 .pip-prog-label{font-size:0.58rem;color:var(--muted);white-space:nowrap;}
+/* SWAP BTN — isolated row */
+.pip-swap-row{display:flex;justify-content:flex-end;padding-top:6px;border-top:1px solid rgba(255,255,255,0.07);}
+.pip-swap-btn{padding:4px 12px;border-radius:9999px;background:transparent;border:1px solid rgba(255,255,255,0.14);color:rgba(244,242,255,0.40);font-size:0.58rem;letter-spacing:0.1em;cursor:pointer;font-family:var(--font-s);transition:all 0.15s;}
+.pip-swap-btn:hover{color:var(--muted);border-color:rgba(255,255,255,0.25);}
 .home-section{padding:0 22px;flex-shrink:0;}
 .section-ttl{font-size:0.58rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted2);margin-bottom:8px;}
 .chips-row{display:flex;gap:7px;overflow-x:auto;padding-bottom:4px;}
@@ -124,7 +124,6 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 .note-save-btn:active{transform:scale(0.97);}
 .voice-hint{font-size:0.62rem;color:var(--muted);text-align:center;padding:4px 0;display:none;}
 .saved-note-preview{font-size:0.78rem;color:var(--muted);font-weight:300;padding:8px 12px;margin-top:6px;background:var(--glass);border-radius:10px;border-left:2px solid var(--pip-acc);white-space:pre-wrap;word-break:break-word;display:none;}
-/* chat button row */
 .chat-btn-row{padding:0 18px 6px;flex-shrink:0;}
 .chat-open-btn{width:100%;padding:10px 14px;border-radius:12px;background:var(--glass);border:1px solid var(--border);color:var(--muted);font-size:0.74rem;font-weight:600;letter-spacing:0.06em;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;transition:all 0.15s;backdrop-filter:blur(4px);}
 .chat-open-btn:active{transform:scale(0.98);background:var(--glass2);}
@@ -154,7 +153,6 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 .bg-picker-opt:active{transform:scale(0.93);}
 .bg-picker-check{position:absolute;bottom:3px;right:3px;width:16px;height:16px;border-radius:50%;background:var(--pip-acc);display:none;align-items:center;justify-content:center;font-size:8px;color:#000;font-weight:700;}
 .bg-picker-opt.sel .bg-picker-check{display:flex;}
-/* ── CHAT PANEL ── */
 #chat-panel{position:fixed;inset:0;z-index:300;display:none;flex-direction:column;background:var(--bg);}
 #chat-panel.open{display:flex;animation:fadeIn 0.25s ease;}
 .chat-topbar{display:flex;align-items:center;gap:12px;padding:10px 18px 10px;flex-shrink:0;background:rgba(13,11,20,0.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);}
@@ -169,52 +167,17 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 .msg-wrap{display:flex;flex-direction:column;}
 .msg-wrap.user{align-items:flex-end;}
 .msg-wrap.assistant{align-items:flex-start;}
-.msg-bubble{
-  max-width:84%;padding:11px 15px;font-size:0.87rem;line-height:1.75;
-  font-weight:300;white-space:pre-wrap;word-break:break-word;
-}
-.msg-wrap.user .msg-bubble{
-  background:var(--glass2);border:1px solid var(--border2);
-  border-radius:18px 18px 4px 18px;color:var(--text);
-}
-.msg-wrap.assistant .msg-bubble{
-  background:var(--pip-dim);border:1px solid var(--pip-border);
-  border-radius:18px 18px 18px 4px;color:var(--text);
-}
-.msg-wrap.assistant.thinking .msg-bubble{
-  color:var(--muted);font-style:italic;font-size:0.78rem;
-}
-.chat-input-row{
-  display:flex;gap:8px;align-items:flex-end;
-  padding:10px 16px 30px;flex-shrink:0;
-  background:rgba(13,11,20,0.85);backdrop-filter:blur(12px);
-  border-top:1px solid var(--border);
-}
-#chat-input{
-  flex:1;background:var(--glass);border:1px solid var(--border);
-  border-radius:20px;padding:11px 16px;color:var(--text);
-  font-family:var(--font-s);font-size:0.87rem;font-weight:300;
-  line-height:1.5;resize:none;outline:none;max-height:110px;
-  transition:border-color 0.15s;
-}
+.msg-bubble{max-width:84%;padding:11px 15px;font-size:0.87rem;line-height:1.75;font-weight:300;white-space:pre-wrap;word-break:break-word;}
+.msg-wrap.user .msg-bubble{background:var(--glass2);border:1px solid var(--border2);border-radius:18px 18px 4px 18px;color:var(--text);}
+.msg-wrap.assistant .msg-bubble{background:var(--pip-dim);border:1px solid var(--pip-border);border-radius:18px 18px 18px 4px;color:var(--text);}
+.chat-input-row{display:flex;gap:8px;align-items:flex-end;padding:10px 16px 30px;flex-shrink:0;background:rgba(13,11,20,0.85);backdrop-filter:blur(12px);border-top:1px solid var(--border);}
+#chat-input{flex:1;background:var(--glass);border:1px solid var(--border);border-radius:20px;padding:11px 16px;color:var(--text);font-family:var(--font-s);font-size:0.87rem;font-weight:300;line-height:1.5;resize:none;outline:none;max-height:110px;transition:border-color 0.15s;}
 #chat-input:focus{border-color:var(--pip-border);}
 #chat-input::placeholder{color:var(--muted2);}
-.chat-send{
-  width:40px;height:40px;border-radius:50%;flex-shrink:0;
-  background:var(--pip-dim);border:1px solid var(--pip-border);
-  color:var(--pip-acc);font-size:1.1rem;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
-  transition:all 0.15s;
-}
+.chat-send{width:40px;height:40px;border-radius:50%;flex-shrink:0;background:var(--pip-dim);border:1px solid var(--pip-border);color:var(--pip-acc);font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s;}
 .chat-send:active{transform:scale(0.92);}
 .chat-send:disabled{opacity:0.35;pointer-events:none;}
-/* voice in chat */
-.chat-mic{
-  width:40px;height:40px;border-radius:50%;flex-shrink:0;
-  background:var(--glass);border:1px solid var(--border);
-  color:var(--muted);font-size:0.9rem;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;transition:all 0.15s;
-}
+.chat-mic{width:40px;height:40px;border-radius:50%;flex-shrink:0;background:var(--glass);border:1px solid var(--border);color:var(--muted);font-size:0.9rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s;}
 .chat-mic.rec{border-color:var(--pip-acc);color:var(--pip-acc);background:var(--pip-dim);}
 .chat-mic:active{transform:scale(0.92);}
 </style>
@@ -291,9 +254,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
       </div>
     </div>
     <div class="chat-btn-row">
-      <button class="chat-open-btn" onclick="openChat()">
-        <span style="font-size:1rem;">💬</span> Discuter de cette étape
-      </button>
+      <button class="chat-open-btn" onclick="openChat()"><span style="font-size:1rem;">💬</span> Discuter de cette étape</button>
     </div>
     <div class="session-footer">
       <button class="foot-btn" id="prev-btn" onclick="prevStep()">← Précédent</button>
@@ -327,7 +288,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
     <button class="picker-cancel" onclick="closeBgPicker()">Annuler</button>
   </div>
 </div>
-<!-- CHAT PANEL -->
+<!-- CHAT -->
 <div id="chat-panel">
   <div class="chat-topbar">
     <button class="back-btn" onclick="closeChat()">←</button>
@@ -346,7 +307,6 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
     <button class="chat-send" id="chat-send-btn" onclick="sendChat()">↑</button>
   </div>
 </div>
-
 <script>
 const RAW  = n => `https://raw.githubusercontent.com/hdesodium/haki/fonds/${n}`;
 const ICON = n => `https://raw.githubusercontent.com/hdesodium/haki/icones/${encodeURIComponent(n)}`;
@@ -359,12 +319,38 @@ const ALL_FONDS = [
   '1117ed42a09da3fe186a256df5fd542f.jpg','dc7ccc4cbbecad7d040922d8b309dacb.jpg',
   '7c6e738aecb103008cde67e438cfeca0.jpg',
 ];
+const ALL_ICONS = [
+  'ultra instinct1.png','ultra instinct2.png','super saiyan1.png','supersaiyan 2.png',
+  'kaioken1.png','kaioken2.png','goku1.png','goku2.png',
+  'salle du temps 1.png','salle du temps 2.png',
+  'zoro-removebg-preview.png','goku1-removebg-preview.png','goku2-removebg-preview.png',
+  '012539e0770f530aaff78368faa9c3e2-removebg-preview.png',
+  '3be6ecf792abf8814bb8dbecfb779f43-removebg-preview.png',
+  '468f7e04775b97f969544e15095c0805-removebg-preview.png',
+  '39fa2a8880ada04fd5eeaa8b1a2e5865 (1).gif',
+  '8a4cd9ade26041f56a6a6f4e41c83c8d.jpg',
+  'd4b2e4a797395d7c3b592b606a291f04.jpg',
+  '39fa2a8880ada04fd5eeaa8b1a2e5865.gif',
+  '06e1a2100460fb84f870352747d07c12.gif',
+  'goku_kaioken_x3_by_kraish657_dgcbs0w-375w-2x.jpg',
+  'Gemini_Generated_Image_6kzv1q6kzv1q6kzv.png',
+  'Gemini_Generated_Image_fqbi0gfqbi0gfqbi.png',
+  'Gemini_Generated_Image_uqicymuqicymuqic.png',
+  'Gemini_Generated_Image_2w05q62w05q62w05.png',
+];
+
+// PIPELINES — order: siiu, ultra_instinct, circuit_social, salle_du_temps
 const PIPELINES = {
+  siiu:{
+    label:'SIIU',acc:'#ffffff',glow:'rgba(255,255,255,0.20)',dim:'rgba(255,255,255,0.07)',border:'rgba(255,255,255,0.28)',
+    bg:'1117ed42a09da3fe186a256df5fd542f.jpg',mode:'emotional',
+    icons:{default:'Gemini_Generated_Image_fqbi0gfqbi0gfqbi.png',alts:ALL_ICONS},
+    steps:[{name:"Discussion libre",prompt:"Ici, pas de structure. Dis ce que tu as sur le cœur."}],
+  },
   ultra_instinct:{
     label:'Ultra Instinct',acc:'#c4b5fd',glow:'rgba(196,181,253,0.25)',dim:'rgba(196,181,253,0.09)',border:'rgba(196,181,253,0.32)',
-    bg:'be6cbf612b172a13bc4bbf06fdb3faae.jpg',
-    mode:'emotional',
-    icons:{default:'ultra instinct1.png',alts:['ultra instinct1.png','ultra instinct2.png','super saiyan1.png','supersaiyan 2.png','kaioken1.png','kaioken2.png','goku1.png','goku2.png','salle du temps 1.png','salle du temps 2.png','zoro-removebg-preview.png','goku1-removebg-preview.png','goku2-removebg-preview.png','012539e0770f530aaff78368faa9c3e2-removebg-preview.png','3be6ecf792abf8814bb8dbecfb779f43-removebg-preview.png','468f7e04775b97f969544e15095c0805-removebg-preview.png','39fa2a8880ada04fd5eeaa8b1a2e5865 (1).gif','8a4cd9ade26041f56a6a6f4e41c83c8d.jpg','d4b2e4a797395d7c3b592b606a291f04.jpg','39fa2a8880ada04fd5eeaa8b1a2e5865.gif','06e1a2100460fb84f870352747d07c12.gif','goku_kaioken_x3_by_kraish657_dgcbs0w-375w-2x.jpg','Gemini_Generated_Image_6kzv1q6kzv1q6kzv.png','Gemini_Generated_Image_fqbi0gfqbi0gfqbi.png','Gemini_Generated_Image_uqicymuqicymuqic.png','Gemini_Generated_Image_2w05q62w05q62w05.png']},
+    bg:'be6cbf612b172a13bc4bbf06fdb3faae.jpg',mode:'emotional',
+    icons:{default:'ultra instinct1.png',alts:ALL_ICONS},
     steps:[
       {name:"Parlons peu, parlons bien",prompt:"Prends un moment pour te centrer.\n\nRacontes-toi librement ta situation. Qu'est-ce qui se passe en ce moment dans ta vie ? Qu'est-ce qui t'a amenée ici aujourd'hui ?\n\nSois honnête avec toi-même. Partage une confidence — quelque chose que tu n'oses pas toujours te dire."},
       {name:"Observation",prompt:"Observe ce que tu ressens.\n\nQuelles émotions sont présentes en ce moment ? Nomme-les avec précision : est-ce de la tristesse, de la colère, de la honte, de la peur, de la frustration ?\n\nQuel est ton besoin primaire ?\n— Autonomie : liberté, contrôle de ta vie, indépendance.\n— Compétence : te sentir capable, efficace, à la hauteur.\n— Connexion : appartenir, être comprise, être aimée.\n\nQuel besoin secondaire, plus personnel, découle de ce besoin primaire ?"},
@@ -377,9 +363,8 @@ const PIPELINES = {
   },
   circuit_social:{
     label:'Social',acc:'#fda4af',glow:'rgba(253,164,175,0.25)',dim:'rgba(253,164,175,0.09)',border:'rgba(253,164,175,0.32)',
-    bg:'24fe508337f6b7cbb3a2f3adab630dea.jpg',
-    mode:'social',
-    icons:{default:'kaioken1.png',alts:['ultra instinct1.png','ultra instinct2.png','super saiyan1.png','supersaiyan 2.png','kaioken1.png','kaioken2.png','goku1.png','goku2.png','salle du temps 1.png','salle du temps 2.png','zoro-removebg-preview.png','goku1-removebg-preview.png','goku2-removebg-preview.png','012539e0770f530aaff78368faa9c3e2-removebg-preview.png','3be6ecf792abf8814bb8dbecfb779f43-removebg-preview.png','468f7e04775b97f969544e15095c0805-removebg-preview.png','39fa2a8880ada04fd5eeaa8b1a2e5865 (1).gif','8a4cd9ade26041f56a6a6f4e41c83c8d.jpg','d4b2e4a797395d7c3b592b606a291f04.jpg','39fa2a8880ada04fd5eeaa8b1a2e5865.gif','06e1a2100460fb84f870352747d07c12.gif','goku_kaioken_x3_by_kraish657_dgcbs0w-375w-2x.jpg','Gemini_Generated_Image_6kzv1q6kzv1q6kzv.png','Gemini_Generated_Image_fqbi0gfqbi0gfqbi.png','Gemini_Generated_Image_uqicymuqicymuqic.png','Gemini_Generated_Image_2w05q62w05q62w05.png']},
+    bg:'24fe508337f6b7cbb3a2f3adab630dea.jpg',mode:'social',
+    icons:{default:'kaioken1.png',alts:ALL_ICONS},
     steps:[
       {name:"Situation relationnelle",prompt:"Pose le contexte.\n\nDécris la situation relationnelle ou sociale que tu veux observer. Qui est impliqué ? Quel est le contexte ? Que s'est-il passé exactement ?\n\nReste factuelle et descriptive, sans jugement pour l'instant."},
       {name:"Dynamiques en jeu",prompt:"Observe les mécanismes.\n\nQuelles dynamiques sont à l'œuvre dans cette relation ou ce groupe ?\n\nY a-t-il des rôles implicites — qui sauve, qui attaque, qui subit ? Y a-t-il une hiérarchie, une compétition, une dépendance ? Comment les échanges fonctionnent-ils — réciprocité, équité, dette ?\n\nNomme ce que tu observes, sans te positionner moralement."},
@@ -392,9 +377,8 @@ const PIPELINES = {
   },
   salle_du_temps:{
     label:'Salle du temps',acc:'#6ee7b7',glow:'rgba(110,231,183,0.25)',dim:'rgba(110,231,183,0.09)',border:'rgba(110,231,183,0.32)',
-    bg:'5443e29eff44bbe56dc6699997ff1df2.jpg',
-    mode:'emotional',
-    icons:{default:'salle du temps 1.png',alts:['ultra instinct1.png','ultra instinct2.png','super saiyan1.png','supersaiyan 2.png','kaioken1.png','kaioken2.png','goku1.png','goku2.png','salle du temps 1.png','salle du temps 2.png','zoro-removebg-preview.png','goku1-removebg-preview.png','goku2-removebg-preview.png','012539e0770f530aaff78368faa9c3e2-removebg-preview.png','3be6ecf792abf8814bb8dbecfb779f43-removebg-preview.png','468f7e04775b97f969544e15095c0805-removebg-preview.png','39fa2a8880ada04fd5eeaa8b1a2e5865 (1).gif','8a4cd9ade26041f56a6a6f4e41c83c8d.jpg','d4b2e4a797395d7c3b592b606a291f04.jpg','39fa2a8880ada04fd5eeaa8b1a2e5865.gif','06e1a2100460fb84f870352747d07c12.gif','goku_kaioken_x3_by_kraish657_dgcbs0w-375w-2x.jpg','Gemini_Generated_Image_6kzv1q6kzv1q6kzv.png','Gemini_Generated_Image_fqbi0gfqbi0gfqbi.png','Gemini_Generated_Image_uqicymuqicymuqic.png','Gemini_Generated_Image_2w05q62w05q62w05.png']},
+    bg:'5443e29eff44bbe56dc6699997ff1df2.jpg',mode:'emotional',
+    icons:{default:'salle du temps 1.png',alts:ALL_ICONS},
     steps:[
       {name:"Bienvenue",prompt:"Bienvenue dans la Salle du temps.\n\nIci, le temps s'arrête. Tu es seule avec toi-même.\n\nRacontes-toi ta situation librement. Qu'est-ce qui t'a amenée ici ? Qu'est-ce que tu portes en ce moment ?\n\nPartage une confidence — quelque chose d'honnête que tu te dis rarement à toi-même."},
       {name:"Confidences",prompt:"Un gage d'honnêteté.\n\nQuelle est la chose que tu n'oses pas tout à fait te dire sur cette situation ? Pas ce que tu dirais à quelqu'un d'autre — ce que tu sais, au fond, et que tu évites de regarder en face.\n\nÉcris-la. Sans filtre."},
@@ -412,50 +396,45 @@ const PIPELINES = {
       {name:"Apprentissage : SIIU",prompt:"La synthèse.\n\nComment peux-tu t'adapter tout en restant dans le respect de toi-même et de l'autre ?\n\nQu'est-ce que tu te crées comme valeur à travers cette expérience ?\n\nMaturité émotionnelle = conscience de tes états internes + capacité d'ajustement pour ton bien-être + conscience des états des autres + ajustement pour le bien-être collectif.\n\nLà où tu en es aujourd'hui sur cette équation — qu'est-ce que tu vois ?",mode:'social'},
     ]
   },
-  siiu:{
-    label:'SIIU',acc:'#ffffff',glow:'rgba(255,255,255,0.20)',dim:'rgba(255,255,255,0.07)',border:'rgba(255,255,255,0.28)',
-    bg:'1117ed42a09da3fe186a256df5fd542f.jpg',
-    mode:'emotional',
-    icons:{default:'Gemini_Generated_Image_fqbi0gfqbi0gfqbi.png',alts:['ultra instinct1.png','ultra instinct2.png','super saiyan1.png','supersaiyan 2.png','kaioken1.png','kaioken2.png','goku1.png','goku2.png','salle du temps 1.png','salle du temps 2.png','zoro-removebg-preview.png','goku1-removebg-preview.png','goku2-removebg-preview.png','012539e0770f530aaff78368faa9c3e2-removebg-preview.png','3be6ecf792abf8814bb8dbecfb779f43-removebg-preview.png','468f7e04775b97f969544e15095c0805-removebg-preview.png','39fa2a8880ada04fd5eeaa8b1a2e5865 (1).gif','8a4cd9ade26041f56a6a6f4e41c83c8d.jpg','d4b2e4a797395d7c3b592b606a291f04.jpg','39fa2a8880ada04fd5eeaa8b1a2e5865.gif','06e1a2100460fb84f870352747d07c12.gif','goku_kaioken_x3_by_kraish657_dgcbs0w-375w-2x.jpg','Gemini_Generated_Image_6kzv1q6kzv1q6kzv.png','Gemini_Generated_Image_fqbi0gfqbi0gfqbi.png','Gemini_Generated_Image_uqicymuqicymuqic.png','Gemini_Generated_Image_2w05q62w05q62w05.png']},
-    steps:[
-      {name:"Discussion libre",prompt:"Ici, pas de structure. Dis ce que tu as sur le cœur."},
-    ]
-  },
 };
 
-const SYSTEM_EMOTIONAL = `Tu es un miroir psychologique neutre. Tu n'es pas une thérapeute, une amie, ni une coach. Tu es un outil de réflexion clinique, sobre, précis, et critique avec bienveillance. Tutoies l'utilisatrice.
+const SYSTEM_EMOTIONAL = `Tu es un miroir psychologique lucide et exigeant. Tu n'es pas là pour rassurer ni pour être agréable, mais pour aider l'utilisatrice à voir clair.
 
 TON RÔLE :
-— Refléter ce que l'utilisatrice exprime, sans interpréter au-delà de ce qu'elle dit.
-— Nommer les émotions et patterns avec précision, sans les amplifier ni les minimiser.
-— Poser des questions qui ouvrent, jamais des questions qui orientent.
-— Être critique et honnête.
+— Refléter précisément ce qu'elle dit, sans extrapoler.
+— Mettre en évidence les contradictions internes, même si c'est inconfortable.
+— Nommer les émotions et les mécanismes avec précision.
+— Amener à une prise de conscience, pas juste une compréhension.
 
-CE QUE TU NE FAIS PAS :
-— Tu ne rassures pas artificiellement.
-— Tu ne valides pas automatiquement les perceptions de l'utilisatrice.
-— Tu ne donnes pas de conseils non sollicités.
-— Tu ne poses pas plusieurs questions à la fois.
+COMPORTEMENT :
+— Si quelque chose est flou → tu demandes de préciser.
+— Si quelque chose est incohérent → tu le pointes.
+— Tu ne valides jamais automatiquement.
+— Tu ne simplifies pas une situation complexe.
 
-FORMAT : Sobre, précis, concis. Langue : français.`;
+INTERDICTIONS :
+— Pas de phrases de réconfort.
+— Pas de conseils directs.
+— Pas de généralités.
 
-const SYSTEM_SOCIAL = `Tu es une IA experte en dynamiques sociales. Tu décris des mécanismes, pas des jugements. Tu n'es pas normative. Tutoies l'utilisatrice.
+FORMAT : 3 à 6 phrases max. 1 seule question à la fin. Ton neutre, lucide, précis. Français.`;
+
+const SYSTEM_SOCIAL = `Tu es une IA d'analyse des dynamiques sociales, froide et factuelle.
 
 TON RÔLE :
-— Analyser les dynamiques relationnelles avec objectivité.
-— Identifier les mécanismes comportementaux et sociaux sous-jacents.
-— Proposer des ajustements comportementaux concrets, ancrés dans la recherche.
-— Nommer les patterns sans jugement moral.
+— Décrire les mécanismes relationnels en jeu.
+— Identifier les patterns comportementaux.
+— Distinguer faits, interprétations et dynamiques implicites.
+— Proposer des ajustements concrets et réalistes.
 
-CE QUE TU NE FAIS PAS :
-— Tu ne moralises pas.
-— Tu ne valides pas les biais cognitifs de l'utilisatrice.
-— Tu ne donnes pas d'opinions sur les tiers mentionnés.
-— Tu ne poses pas plusieurs questions à la fois.
+COMPORTEMENT :
+— Tu ne prends aucun parti.
+— Tu ne juges pas moralement.
+— Tu ne valides pas les biais de l'utilisatrice.
 
-FORMAT : Direct, factuel. Maximum 5-6 phrases. Langue : français.`;
+FORMAT : 4 à 6 phrases max. 1 question OU 1 ajustement concret à la fin. Style direct. Français.`;
 
-const GROQ_KEY   = 'REMPLACE_PAR_TA_CLE_GROQ';
+const GROQ_KEY   = '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';
 const GROQ_MODEL = 'llama-3.3-70b-versatile';
 
 const S = {
@@ -550,11 +529,10 @@ function renderHome(){
         <div class="pip-card-top">
           <div class="pip-icon-wrap" style="border-color:${cfg.border};box-shadow:0 3px 14px ${cfg.glow};">
             <img src="${iconSrc(key)}" alt="">
-
           </div>
           <div class="pip-card-info">
             <div class="pip-card-label" style="color:${cfg.acc};">${cfg.label}</div>
-            <div class="pip-card-sub">${steps.length} étapes</div>
+            <div class="pip-card-sub">${steps.length} étape${steps.length>1?'s':''}</div>
           </div>
         </div>
         <div class="pip-card-bottom">
@@ -562,14 +540,25 @@ function renderHome(){
           <div class="pip-prog-label" style="color:${cfg.acc};">${stepLbl}</div>
         </div>
         <div class="pip-swap-row">
-          <button class="pip-swap-btn" onclick="openIconPicker(event,'${key}')">⇄</button>
+          <button class="pip-swap-btn" data-pip="${key}">⇄ icône</button>
         </div>
       </div>`;
-    card.onclick=e=>{
-      if(e.target.closest('.icon-swap-btn'))return;
-      if(key==='siiu'){S.pipeline=key;applyTheme(key);if(!S.convName){S.convName=`haki_${ts()}`;}chatHistory=[];openChat();return;}
+
+    // swap button — stops propagation cleanly
+    card.querySelector('.pip-swap-btn').addEventListener('click', function(e){
+      e.stopPropagation();
+      openIconPicker(e, key);
+    });
+
+    card.addEventListener('click', function(){
+      if(key==='siiu'){
+        S.pipeline=key;applyTheme(key);
+        if(!S.convName){S.convName=`haki_${ts()}`;}
+        chatHistory=[];openChat();return;
+      }
       startSession(key);
-    };
+    });
+
     list.appendChild(card);
   });
   const chips=document.getElementById('conv-chips');chips.innerHTML='';
@@ -607,7 +596,6 @@ function renderSession(){
   else{prev.style.display='none';dot.style.display='none';}
   document.getElementById('notes-body').classList.remove('open');
   document.getElementById('notes-chev').classList.remove('open');
-  // reset chat history on step change
   chatHistory=[];
 }
 window.nextStep=function(){const cfg=pip();if(S.step<cfg.steps.length-1){S.step++;renderSession();saveSession();}};
@@ -660,7 +648,7 @@ window.maybeCloseSettings=function(e){if(e.target===document.getElementById('set
 window.openIconPicker=function(e,pipKey){
   e.stopPropagation();S.editingPip=pipKey;applyTheme(pipKey);
   const grid=document.getElementById('picker-grid');grid.innerHTML='';
-  PIPELINES[pipKey].icons.alts.forEach(name=>{
+  ALL_ICONS.forEach(name=>{
     const div=document.createElement('div');div.className='picker-opt'+(iconFor(pipKey)===name?' sel':'');
     div.innerHTML=`<img src="${ICON(name)}" alt="">`;
     div.onclick=()=>{S.iconChoice[pipKey]=name;closeIconPicker();renderHome();savePrefs();};
@@ -686,22 +674,24 @@ window.closeBgPicker=function(){document.getElementById('bg-picker').classList.r
 window.maybeCloseBgPicker=function(e){if(e.target===document.getElementById('bg-picker'))closeBgPicker();};
 
 // ── CHAT ──
-let chatHistory=[];
-let chatStreaming=false;
-let chatRecog=null,chatListening=false;
+let chatHistory=[],chatStreaming=false,chatRecog=null,chatListening=false;
 
 function getStepMode(){
   const step=pip().steps[S.step];
-  return step.mode || pip().mode || 'emotional';
+  return step.mode||pip().mode||'emotional';
 }
 function buildSystemPrompt(){
-  const mode=getStepMode();
-  const base=mode==='social'?SYSTEM_SOCIAL:SYSTEM_EMOTIONAL;
-  const step=pip().steps[S.step];
   const now=new Date();
   const j=['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'];
   const m=['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
-  return `${base}\n\n---\nDate : ${j[now.getDay()]} ${now.getDate()} ${m[now.getMonth()]} ${now.getFullYear()}\nPipeline : ${pip().label}\nÉtape en cours : ${step.name}\nContexte de l'étape : ${step.prompt.split('\n')[0]}`;
+  const dateStr=`${j[now.getDay()]} ${now.getDate()} ${m[now.getMonth()]} ${now.getFullYear()}`;
+  if(S.pipeline==='siiu'){
+    return `Tu es un espace de discussion libre, bienveillant et lucide. Tu tutoies l'utilisatrice. Tu l'écoutes, tu reformules, tu questionnes avec justesse. Pas de structure imposée — tu suis le fil de ce qu'elle apporte. Tu restes sobre, précis, sans conseils non sollicités. Tu poses une seule question à la fois quand tu en poses une.\n\nDate : ${dateStr}\nLangue : français.`;
+  }
+  const mode=getStepMode();
+  const base=mode==='social'?SYSTEM_SOCIAL:SYSTEM_EMOTIONAL;
+  const step=pip().steps[S.step];
+  return `${base}\n\n---\nDate : ${dateStr}\nPipeline : ${pip().label}\nÉtape : ${step.name}\n\nObjectif de l'étape :\n${step.prompt}\n\nReste strictement focalisé sur cette étape.`;
 }
 
 window.openChat=function(){
@@ -712,7 +702,7 @@ window.openChat=function(){
   document.getElementById('chat-step-name-lbl').textContent=step.name;
   applyTheme(S.pipeline);
   if(chatHistory.length===0){
-    const intro={role:'assistant',content:`Je suis là pour cette étape.\n\nPar où veux-tu commencer ?`};
+    const intro={role:'assistant',content:`Je suis là.\n\nPar où veux-tu commencer ?`};
     chatHistory.push(intro);
     renderChatMsgs();
   }
@@ -723,21 +713,15 @@ window.closeChat=function(){document.getElementById('chat-panel').classList.remo
 window.clearChat=function(){chatHistory=[];document.getElementById('chat-messages').innerHTML='';};
 
 function renderChatMsgs(){
-  const el=document.getElementById('chat-messages');
-  el.innerHTML='';
+  const el=document.getElementById('chat-messages');el.innerHTML='';
   chatHistory.forEach(m=>appendBubble(m,false));
   el.scrollTop=el.scrollHeight;
 }
-
 function appendBubble(msg,scroll=true){
   const el=document.getElementById('chat-messages');
-  const wrap=document.createElement('div');
-  wrap.className=`msg-wrap ${msg.role}`;
-  const bubble=document.createElement('div');
-  bubble.className='msg-bubble';
-  bubble.textContent=msg.content;
-  wrap.appendChild(bubble);
-  el.appendChild(wrap);
+  const wrap=document.createElement('div');wrap.className=`msg-wrap ${msg.role}`;
+  const bubble=document.createElement('div');bubble.className='msg-bubble';bubble.textContent=msg.content;
+  wrap.appendChild(bubble);el.appendChild(wrap);
   if(scroll)el.scrollTop=el.scrollHeight;
   return bubble;
 }
@@ -748,28 +732,21 @@ window.sendChat=async function(){
   const text=inp.value.trim();if(!text)return;
   inp.value='';inp.style.height='auto';
   const userMsg={role:'user',content:text};
-  chatHistory.push(userMsg);
-  appendBubble(userMsg);
-  chatStreaming=true;
-  document.getElementById('chat-send-btn').disabled=true;
+  chatHistory.push(userMsg);appendBubble(userMsg);
+  chatStreaming=true;document.getElementById('chat-send-btn').disabled=true;
   const assistantMsg={role:'assistant',content:''};
   chatHistory.push(assistantMsg);
   const bubble=appendBubble(assistantMsg);
   bubble.textContent='…';
   try{
-    const messages=[
-      {role:'system',content:buildSystemPrompt()},
-      ...chatHistory.slice(0,-1)
-    ];
+    const messages=[{role:'system',content:buildSystemPrompt()},...chatHistory.slice(0,-1)];
     const resp=await fetch('https://api.groq.com/openai/v1/chat/completions',{
       method:'POST',
       headers:{'Content-Type':'application/json','Authorization':`Bearer ${GROQ_KEY}`},
       body:JSON.stringify({model:GROQ_MODEL,messages,stream:true,max_tokens:800,temperature:0.72})
     });
     if(!resp.ok){const err=await resp.text();throw new Error(err);}
-    const reader=resp.body.getReader();
-    const dec=new TextDecoder();
-    let buf='';
+    const reader=resp.body.getReader();const dec=new TextDecoder();let buf='';
     bubble.textContent='';
     while(true){
       const{done,value}=await reader.read();if(done)break;
@@ -781,11 +758,8 @@ window.sendChat=async function(){
         try{const j=JSON.parse(data);const delta=j.choices?.[0]?.delta?.content||'';if(delta){assistantMsg.content+=delta;bubble.textContent=assistantMsg.content;document.getElementById('chat-messages').scrollTop=document.getElementById('chat-messages').scrollHeight;}}catch(e){}
       }
     }
-  }catch(e){
-    assistantMsg.content='❌ '+e.message;bubble.textContent=assistantMsg.content;
-  }
-  chatStreaming=false;
-  document.getElementById('chat-send-btn').disabled=false;
+  }catch(e){assistantMsg.content='❌ '+e.message;bubble.textContent=assistantMsg.content;}
+  chatStreaming=false;document.getElementById('chat-send-btn').disabled=false;
 };
 
 window.toggleChatVoice=function(){
