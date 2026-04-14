@@ -472,7 +472,7 @@ async function initFB(){
   try{
     const {initializeApp}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
     const {getFirestore,collection,doc,getDocs,getDoc,setDoc}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-    const app=initializeApp({apiKey:'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',authDomain:'haki-2a75b.firebaseapp.com',projectId:'haki-2a75b',storageBucket:'haki-2a75b.firebasestorage.app',messagingSenderId:'1096421970989',appId:'1:1096421970989:web:451f594188d541f5b554a4'});
+    const app=initializeApp({apiKey:'AIzaSyA9M8K9VGejqHCq8S22y2iPzd5rHF3bsBM',authDomain:'haki-2a75b.firebaseapp.com',projectId:'haki-2a75b',storageBucket:'haki-2a75b.firebasestorage.app',messagingSenderId:'1096421970989',appId:'1:1096421970989:web:451f594188d541f5b554a4'});
     db=getFirestore(app);
     window._fs={collection,doc,getDocs,getDoc,setDoc};
     syncUI('ok','sync');
